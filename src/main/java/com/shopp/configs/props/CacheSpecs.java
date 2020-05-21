@@ -59,7 +59,7 @@ public class CacheSpecs {
         @Override
         public String toString() {
             return "CacheSetting{" +
-                    ", minCapacity=" + minCapacity +
+                    " minCapacity=" + minCapacity +
                     ", maxCapacity=" + maxCapacity +
                     ", ttlSecs=" + ttlSecs +
                     '}';

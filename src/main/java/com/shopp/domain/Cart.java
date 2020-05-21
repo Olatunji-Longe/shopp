@@ -1,12 +1,8 @@
 package com.shopp.domain;
 
 import com.shopp.domain.dto.CartDTO;
-import com.shopp.domain.dto.EntityDTO;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -17,15 +13,15 @@ import java.util.Objects;
 public class Cart extends RootEntity {
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private User user;
+    @JoinColumn(name = "store_id", referencedColumnName = "id", nullable = false)
+    private Store store;
 
-    public User getUser() {
-        return user;
+    public Store getStore() {
+        return store;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     @Override
@@ -34,12 +30,12 @@ public class Cart extends RootEntity {
         if (o == null || getClass() != o.getClass()) return false;
         Cart cart = (Cart) o;
         return Objects.equals(id, cart.id) &&
-                Objects.equals(user, cart.user);
+                Objects.equals(store, cart.store);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, user.getUsername());
+        return Objects.hash(id, store.getId());
     }
 
     @Override

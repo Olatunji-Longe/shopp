@@ -1,11 +1,19 @@
 set MODE MYSQL;
 
-alter table cart_items drop constraint if exists constr_cart_items_quantity;
-alter table cart_items add constraint constr_cart_items_quantity check(quantity > 0);
+insert IGNORE into stores (name) values ('shopp');
 
-insert IGNORE into users (username, password) values ('current_user', 'secret');
+insert IGNORE into addresses (building_no, street, city, zip_code, state, country) values ('28', 'Obasanjo Avenue', 'Victoria Island', '10001', 'Lagos', 'Nigeria');
+insert IGNORE into addresses (building_no, street, city, zip_code, state, country) values ('7', 'St. Bellerin Drive', 'Lakeshore', 'V4N7G6', 'Ottawa', 'Canada');
 
-insert IGNORE into carts (user_id) values ((select id from users where username='current_user'));
+insert IGNORE into store_addresses (store_id, address_id) values ((select id from stores where name='shopp'), (select id from addresses where zip_code='10001'));
+
+insert IGNORE into carts (store_id) values ((select id from stores where name='shopp'));
+
+insert IGNORE into users (first_name, last_name, email, cart_id) values ('Olatunji', 'Longe', 'olatunji@longe.com', (select ct.id from carts ct, stores st where ct.store_id=st.id and st.name='shopp'));
+
+insert IGNORE into credentials (username, password, user_id) values ('olatunji.longe', 'secret', (select id from users where email='olatunji@longe.com'));
+
+insert IGNORE into user_addresses (user_id, address_id) values ((select id from users where email='olatunji@longe.com'), (select id from addresses where zip_code='V4N7G6'));
 
 insert IGNORE into books (isbn, title, author, language, year, image_url, price) values ('A-1234', 'title-1', 'author-1', 'english', 2004, 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1352082529l/37781.jpg', 200.00);
 insert IGNORE into books (isbn, title, author, language, year, image_url, price) values ('B-1234', 'title-2', 'author-2', 'french', 2001, 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1520258755l/18512._SY475_.jpg', 5000.00);
@@ -24,8 +32,15 @@ insert IGNORE into books (isbn, title, author, language, year, image_url, price)
 insert IGNORE into books (isbn, title, author, language, year, image_url, price) values ('O-1234', 'title-15', 'author-3', 'french', 1974, 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1459795105l/12996._SY475_.jpg', 50.50);
 insert IGNORE into books (isbn, title, author, language, year, image_url, price) values ('P-1234', 'title-16', 'author-2', 'yoruba', 1974, 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1318116526l/51496.jpg', 95.00);
 
-insert IGNORE into cart_items (book_id, quantity, cart_id, checkout_state, active) values ((select id from books where isbn='A-1234'), 3, (select ct.id from carts ct, users u where ct.user_id=u.id and u.username='current_user'), 'QUEUED', true);
-insert IGNORE into cart_items (book_id, quantity, cart_id, checkout_state, active) values ((select id from books where isbn='B-1234'), 1, (select ct.id from carts ct, users u where ct.user_id=u.id and u.username='current_user'), 'QUEUED', true);
-insert IGNORE into cart_items (book_id, quantity, cart_id, checkout_state, active) values ((select id from books where isbn='C-1234'), 2, (select ct.id from carts ct, users u where ct.user_id=u.id and u.username='current_user'), 'QUEUED', true);
-insert IGNORE into cart_items (book_id, quantity, cart_id, checkout_state, active) values ((select id from books where isbn='D-1234'), 4, (select ct.id from carts ct, users u where ct.user_id=u.id and u.username='current_user'), 'QUEUED', true);
-insert IGNORE into cart_items (book_id, quantity, cart_id, checkout_state, active) values ((select id from books where isbn='E-1234'), 3, (select ct.id from carts ct, users u where ct.user_id=u.id and u.username='current_user'), 'QUEUED', true);
+alter table cart_items drop constraint if exists constr_cart_items_quantity;
+alter table cart_items add constraint constr_cart_items_quantity check(quantity > 0);
+
+insert IGNORE into cart_items (book_id, quantity, cart_id, checkout_state, active) values ((select id from books where isbn='A-1234'), 3, (select ct.id from carts ct, users u where ct.id=u.cart_id and u.email='olatunji@longe.com'), 'QUEUED', true);
+insert IGNORE into cart_items (book_id, quantity, cart_id, checkout_state, active) values ((select id from books where isbn='B-1234'), 1, (select ct.id from carts ct, users u where ct.id=u.cart_id and u.email='olatunji@longe.com'), 'QUEUED', true);
+insert IGNORE into cart_items (book_id, quantity, cart_id, checkout_state, active) values ((select id from books where isbn='C-1234'), 2, (select ct.id from carts ct, users u where ct.id=u.cart_id and u.email='olatunji@longe.com'), 'QUEUED', true);
+insert IGNORE into cart_items (book_id, quantity, cart_id, checkout_state, active) values ((select id from books where isbn='D-1234'), 4, (select ct.id from carts ct, users u where ct.id=u.cart_id and u.email='olatunji@longe.com'), 'QUEUED', true);
+insert IGNORE into cart_items (book_id, quantity, cart_id, checkout_state, active) values ((select id from books where isbn='E-1234'), 3, (select ct.id from carts ct, users u where ct.id=u.cart_id and u.email='olatunji@longe.com'), 'QUEUED', true);
+
+
+
+

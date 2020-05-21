@@ -10,7 +10,6 @@ import java.util.List;
 public class CartDTO extends EntityDTO<Cart> {
 
     private Long id;
-    private Long userId;
     private List<CartItemDTO> cartItems = new ArrayList<>();
     private BigDecimal subTotal;
 
@@ -29,7 +28,6 @@ public class CartDTO extends EntityDTO<Cart> {
     @Override
     protected void load(Cart cart) {
         this.id = cart.getId();
-        this.userId = cart.getUser() != null ? cart.getUser().getId() : null;
     }
 
     public static CartDTO of(List<CartItem> cartItems) {
@@ -38,10 +36,6 @@ public class CartDTO extends EntityDTO<Cart> {
 
     public Long getId() {
         return id;
-    }
-
-    public Long getUserId() {
-        return userId;
     }
 
     public List<CartItemDTO> getCartItems() {

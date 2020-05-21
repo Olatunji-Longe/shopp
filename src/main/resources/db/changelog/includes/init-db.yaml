@@ -3,8 +3,144 @@ databaseChangeLog:
       id: create-initial-tables
       author: olatunji.longe
       changes:
+
+        - createTable:
+            tableName: stores
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+        - createTable:
+            tableName: addresses
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: country
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: state
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: city
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: street
+                  type: varchar(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: building_no
+                  type: varchar(8)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: zip_code
+                  type: varchar(8)
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: store_addresses
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: store_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_store_addresses_store_id
+                    references: stores(id)
+                    nullable: false
+              - column:
+                  name: address_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_store_addresses_address_id
+                    references: addresses(id)
+                    nullable: false
+
+        - createTable:
+            tableName: carts
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: store_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_carts_store_id
+                    references: stores(id)
+                    nullable: false
+
         - createTable:
             tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: cart_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_user_carts_id
+                    references: carts(id)
+                    nullable: false
+
+        - createTable:
+            tableName: credentials
             columns:
               - column:
                   name: id
@@ -23,6 +159,38 @@ databaseChangeLog:
                   name: password
                   type: varchar(32)
                   constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_credentials_user_id
+                    references: users(id)
+                    nullable: false
+
+        - createTable:
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_user_addresses_user_id
+                    references: users(id)
+                    nullable: false
+              - column:
+                  name: address_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_user_addresses_address_id
+                    references: addresses(id)
                     nullable: false
 
         - createTable:
@@ -71,24 +239,6 @@ databaseChangeLog:
                     nullable: false
 
         - createTable:
-            tableName: carts
-            columns:
-              - column:
-                  name: id
-                  type: bigint
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: user_id
-                  type: bigint
-                  constraints:
-                    foreignKeyName: fk_carts_user_id
-                    references: users(id)
-                    nullable: false
-
-        - createTable:
             tableName: cart_items
             columns:
               - column:
@@ -126,6 +276,142 @@ databaseChangeLog:
                   name: active
                   type: boolean
                   constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: total_amount
+                  type: decimal
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_fees
+                  type: decimal
+                  constraints:
+                    nullable: false
+              - column:
+                  name: net_total
+                  type: decimal
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reference
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: source_address
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_orders_source_address_id
+                    references: addresses(id)
+                    nullable: false
+              - column:
+                  name: destination_address
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_orders_destination_address_id
+                    references: addresses(id)
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: creator_username
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: modified_at
+                  type: date
+              - column:
+                  name: modifier_username
+                  type: varchar(32)
+
+        - createTable:
+            tableName: order_cart_items
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_order_cart_items_order_id
+                    references: orders(id)
+                    nullable: false
+              - column:
+                  name: cart_item_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_order_cart_items_cart_item_id
+                    references: cart_items(id)
+                    nullable: false
+
+        - createTable:
+            tableName: fees
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: fee_type
+                  type: varchar(16)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: decimal
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(255)
+
+        - createTable:
+            tableName: order_fees
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_order_fees_order_id
+                    references: orders(id)
+                    nullable: false
+              - column:
+                  name: fee_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_order_fees_fee_id
+                    references: fees(id)
                     nullable: false
 
   - changeSet:

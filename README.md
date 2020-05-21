@@ -2,7 +2,7 @@
 
 ### About this project
 This project represents a small REST backend for a book-store, exposing several endpoints that are leveraged by it's peer
-web app `shopp-web`.
+web app [shopp-web:](https://github.com/Olatunji-Longe/shopp-web).
 
 ---
 
@@ -15,7 +15,7 @@ This project utilizes the following technologies;
 - Liquibase (db migration)
 - Caffeine (memory caching)
 - Redis (Disabled, but can be optionally turned to replace caffeine for more robust standalone caching)
-- A peer front-end application (written in React-16 webhooks) which consumes the APIs exposed by this service
+- A peer front-end application [shopp-web:](https://github.com/Olatunji-Longe/shopp-web) (written in React-16 webhooks) which consumes the APIs exposed by this service
 - JUnit (testing)
 - REST endpoints
     
