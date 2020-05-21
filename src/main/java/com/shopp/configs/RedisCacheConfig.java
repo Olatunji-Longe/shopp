@@ -20,7 +20,7 @@ import java.util.Map;
 
 //@Configuration
 //@EnableCaching
-@EnableConfigurationProperties({/*CacheProps.class, */CacheSpecs.class})
+@EnableConfigurationProperties({CacheSpecs.class})
 public class RedisCacheConfig extends CachingConfigurerSupport {
 
     private CacheSpecs specs;
