@@ -1,0 +1,142 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-initial-tables
+      author: olatunji.longe
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: books
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: isbn
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: author
+                  type: varchar(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: language
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: year
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: image_url
+                  type: varchar(255)
+              - column:
+                  name: price
+                  type: decimal
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: carts
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_carts_user_id
+                    references: users(id)
+                    nullable: false
+
+        - createTable:
+            tableName: cart_items
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: book_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_cart_items_book_id
+                    references: books(id)
+                    nullable: false
+              - column:
+                  name: quantity
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cart_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_cart_items_cart_id
+                    references: carts(id)
+                    nullable: false
+              - column:
+                  name: checkout_state
+                  type: char(16)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: active
+                  type: boolean
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: insert-initial-data
+      author: olatunji.longe
+      changes:
+        - sqlFile:
+            dbms: h2
+            encoding: UTF-8
+            endDelimiter: ';'
+            path: ../queries/init.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true

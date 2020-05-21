@@ -1,0 +1,61 @@
+server:
+  port: 8090
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: shopp
+  datasource:
+    url: jdbc:h2:file:./shopp/database/shoppdb;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=TRUE
+    driverClassName: org.h2.Driver
+    username: admin
+    password: secret
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        order_inserts: true
+        order_updates: true
+        jdbc:
+          batch_size: 20
+  messages:
+    basename: classpath:i18n/messages
+    cache-duration: -1
+    encoding: UTF-8
+  thymeleaf:
+    enabled: true
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .htm
+  cache:
+    type: redis
+  redis:
+    host: localhost
+    port: 6379
+
+caching:
+  specs:
+    timeout-secs: 60
+    settings:
+      book:
+        min-capacity: 100
+        max-capacity: 500
+        ttl-secs: 120
+      book-list:
+        min-capacity: 100
+        max-capacity: 500
+        ttl-secs: 120
+      shopping-cart-item:
+        min-capacity: 100
+        max-capacity: 500
+        ttl-secs: 120
+      shopping-cart-item-list:
+        min-capacity: 100
+        max-capacity: 500
+        ttl-secs: 120
+
+web:
+  client:
+    port: 3000
