@@ -1,7 +1,8 @@
 # Getting Started
 
 ### About this project
-This project currently represents a POC for asynchronously requesting and consuming Dealer Credential information from AuctionAccess.
+This project represents a small REST backend for a book-store, exposing several endpoints that are leveraged by it's peer
+web app `shopp-web`.
 
 ---
 
@@ -31,7 +32,7 @@ All of the APIs are accessible via `http://localhost:8090/api/**` if you want to
 Please see the API documentation here:
 
    - Schema definitions : http://localhost:8090/api/v3/api-docs/
-   - Endpoints: http://localhost:8090/api/swagger-ui/index.html
+   - Endpoints: http://localhost:8090/api/swagger-ui/index.html?configUrl=/api/v3/api-docs/swagger-config#/
     
     
 NOTE - All data exposed by the API endpoints are preloaded on the application's first start up. To reset the data, 
