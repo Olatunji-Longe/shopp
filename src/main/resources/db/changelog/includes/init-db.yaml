@@ -269,7 +269,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: checkout_state
-                  type: char(16)
+                  type: varchar(16)
                   constraints:
                     nullable: false
               - column:
@@ -310,14 +310,14 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
-                  name: source_address
+                  name: source_address_id
                   type: bigint
                   constraints:
                     foreignKeyName: fk_orders_source_address_id
                     references: addresses(id)
                     nullable: false
               - column:
-                  name: destination_address
+                  name: destination_address_id
                   type: bigint
                   constraints:
                     foreignKeyName: fk_orders_destination_address_id
@@ -325,7 +325,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: created_at
-                  type: date
+                  type: timestamp
                   constraints:
                     nullable: false
               - column:
@@ -335,7 +335,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: modified_at
-                  type: date
+                  type: timestamp
               - column:
                   name: modifier_username
                   type: varchar(32)

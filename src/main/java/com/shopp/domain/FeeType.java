@@ -1,9 +1,26 @@
 package com.shopp.domain;
 
-/**
- * @author Olatunji O. Longe
- * @created 21 May, 2020, 11:10 AM
- */
+import java.math.BigDecimal;
+
 public enum FeeType {
-    PRODUCT, TAX, SHIPPING, DISCOUNT
+    TAX(true, asPercentageRatio(13)),
+    SHIPPING(false, BigDecimal.ZERO),
+    DISCOUNT(true, asPercentageRatio(5));
+
+    private boolean usesPercentage;
+    private BigDecimal percentage;
+
+    FeeType(boolean usesPercentage, BigDecimal percentage) {
+        this.usesPercentage = usesPercentage;
+        this.percentage = percentage;
+    }
+
+    private static  BigDecimal asPercentageRatio(int percentage) {
+        return BigDecimal.valueOf(percentage).divide(BigDecimal.valueOf(100), 2, BigDecimal.ROUND_HALF_EVEN);
+    }
+
+    public BigDecimal of(BigDecimal totalAmount) {
+        return this.usesPercentage ? totalAmount.multiply(this.percentage).setScale(2, BigDecimal.ROUND_HALF_EVEN) : this.percentage;
+    }
+
 }

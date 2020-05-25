@@ -2,9 +2,13 @@ package com.shopp.domain.dto;
 
 import com.shopp.domain.Fee;
 import com.shopp.domain.FeeType;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
+@Getter
+@SuperBuilder
 public class FeeDTO extends EntityDTO<Fee> {
 
     private Long id;
@@ -22,15 +26,4 @@ public class FeeDTO extends EntityDTO<Fee> {
         this.amount = fee.getAmount();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public FeeType getFeeType() {
-        return feeType;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
 }

@@ -13,7 +13,7 @@ spring:
     password: secret
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     properties:
       hibernate:
         order_inserts: true

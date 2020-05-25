@@ -1,9 +1,13 @@
 package com.shopp.domain.dto;
 
 import com.shopp.domain.Book;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
+@Getter
+@SuperBuilder
 public class BookDTO extends EntityDTO<Book> {
 
     private Long id;
@@ -31,35 +35,4 @@ public class BookDTO extends EntityDTO<Book> {
         this.price = book.getPrice();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getIsbn() {
-        return isbn;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
 }

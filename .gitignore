@@ -5,6 +5,7 @@ build/
 !**/src/main/**
 !**/src/test/**
 database
+shopp/database
 
 ### STS ###
 .apt_generated
