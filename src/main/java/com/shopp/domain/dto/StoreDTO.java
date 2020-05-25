@@ -1,9 +1,15 @@
 package com.shopp.domain.dto;
 
 import com.shopp.domain.Store;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@SuperBuilder
 public class StoreDTO extends EntityDTO<Store> {
 
     private long id;
@@ -21,15 +27,4 @@ public class StoreDTO extends EntityDTO<Store> {
         this.addresses = AddressDTO.list(store.getAddresses());
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<AddressDTO> getAddresses() {
-        return addresses;
-    }
 }

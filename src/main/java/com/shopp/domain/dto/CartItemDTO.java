@@ -2,9 +2,14 @@ package com.shopp.domain.dto;
 
 import com.shopp.domain.CartItem;
 import com.shopp.domain.CheckoutState;
+import com.shopp.services.CartService;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
+@Getter
+@SuperBuilder
 public class CartItemDTO extends EntityDTO<CartItem> {
 
     private Long id;
@@ -27,34 +32,7 @@ public class CartItemDTO extends EntityDTO<CartItem> {
         this.cartId = cartItem.getCart() != null ? cartItem.getCart().getId() : null;
         this.checkoutState = cartItem.getCheckoutState();
         this.active = cartItem.isActive();
-        this.totalPrice = cartItem.getBook().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+        this.totalPrice = CartService.calculateCartItemTotalPrice(cartItem);
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public BookDTO getBook() {
-        return book;
-    }
-
-    public Long getCartId() {
-        return cartId;
-    }
-
-    public CheckoutState getCheckoutState() {
-        return checkoutState;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
-    }
 }

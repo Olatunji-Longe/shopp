@@ -10,10 +10,10 @@ import java.util.IllegalFormatException;
 import java.util.Locale;
 
 @Component
-public class Localizer extends MessageSourceAccessor {
+public class Translator extends MessageSourceAccessor {
 
     @Autowired
-    public Localizer(MessageSource messageSource) {
+    public Translator(MessageSource messageSource) {
         //super(messageSource, LocaleContextHolder.getLocale());
         super(messageSource, Locale.ENGLISH);
     }

@@ -1,17 +1,18 @@
 package com.shopp.controllers;
 
 import com.shopp.domain.dto.CartDTO;
+import com.shopp.exceptions.CheckoutStateException;
 import com.shopp.exceptions.InvalidRequestException;
 import com.shopp.requests.CartItemRequest;
 import com.shopp.requests.CartRequest;
 import com.shopp.responses.ResponseBuilder;
 import com.shopp.responses.RestResponse;
 import com.shopp.services.CartService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,13 +25,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.EntityNotFoundException;
 
+@Slf4j
+@Transactional
 @RestController
 @RequestMapping("/cart")
 public class CartController {
 
     private CartService cartService;
-
-    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 
     @Autowired
     public CartController(CartService cartService) {
@@ -47,11 +48,11 @@ public class CartController {
                             .build()
             );
         }catch(EntityNotFoundException ex){
-            logger.warn(ex.getMessage());
+            log.warn(ex.getMessage());
             return responseBuilder.httpError(HttpStatus.NOT_FOUND, ex.getMessage());
 
         }catch(Exception ex){
-            logger.error("error while attempting to get cart", ex);
+            log.error("error while attempting to get cart", ex);
             return responseBuilder.httpError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
@@ -66,11 +67,11 @@ public class CartController {
                             .build()
             );
         }catch(EntityNotFoundException ex){
-            logger.warn(ex.getMessage());
+            log.warn(ex.getMessage());
             return responseBuilder.httpError(HttpStatus.NOT_FOUND, ex.getMessage());
 
         }catch(Exception ex){
-            logger.error("error while attempting to get cart item", ex);
+            log.error("error while attempting to get cart item", ex);
             return responseBuilder.httpError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
@@ -87,15 +88,15 @@ public class CartController {
                             .build()
             );
         }catch(InvalidRequestException ex){
-            logger.warn(ex.getMessage());
+            log.warn(ex.getMessage());
             return responseBuilder.httpError(HttpStatus.BAD_REQUEST, ex.getMessage());
 
         }catch(EntityNotFoundException ex){
-            logger.warn(ex.getMessage());
+            log.warn(ex.getMessage());
             return responseBuilder.httpError(HttpStatus.NOT_FOUND, ex.getMessage());
 
         }catch(Exception ex){
-            logger.error("error while attempting to update cart item quantity", ex);
+            log.error("error while attempting to update cart item quantity", ex);
             return responseBuilder.httpError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
@@ -112,15 +113,15 @@ public class CartController {
                             .build()
             );
         }catch(InvalidRequestException ex){
-            logger.warn(ex.getMessage());
+            log.warn(ex.getMessage());
             return responseBuilder.httpError(HttpStatus.BAD_REQUEST, ex.getMessage());
 
         }catch(EntityNotFoundException ex){
-            logger.warn(ex.getMessage());
+            log.warn(ex.getMessage());
             return responseBuilder.httpError(HttpStatus.NOT_FOUND, ex.getMessage());
 
         }catch(Exception ex){
-            logger.error("error while attempting to delete book from cart", ex);
+            log.error("error while attempting to delete book from cart", ex);
             return responseBuilder.httpError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
@@ -131,19 +132,19 @@ public class CartController {
         try{
             return ResponseEntity.ok(
                     responseBuilder
-                            .data("cart", CartDTO.of(cartService.checkoutBooksFromCart(payload)))
+                            .data("order", cartService.checkoutBooksFromCart(payload).toDTO())
                             .build()
             );
-        }catch(InvalidRequestException ex){
-            logger.warn(ex.getMessage());
+        }catch(InvalidRequestException | CheckoutStateException ex){
+            log.warn(ex.getMessage());
             return responseBuilder.httpError(HttpStatus.BAD_REQUEST, ex.getMessage());
 
         }catch(EntityNotFoundException ex){
-            logger.warn(ex.getMessage());
+            log.warn(ex.getMessage());
             return responseBuilder.httpError(HttpStatus.NOT_FOUND, ex.getMessage());
 
-        }catch(Exception ex){
-            logger.error("error while attempting to checkout books from cart", ex);
+        } catch(Exception ex){
+            log.error("error while attempting to checkout books from cart", ex);
             return responseBuilder.httpError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
@@ -157,16 +158,16 @@ public class CartController {
                             .data("cart", CartDTO.of(cartService.purgeBooksFromCart(payload)))
                             .build()
             );
-        }catch(InvalidRequestException ex){
-            logger.warn(ex.getMessage());
+        }catch(InvalidRequestException | CheckoutStateException ex){
+            log.warn(ex.getMessage());
             return responseBuilder.httpError(HttpStatus.BAD_REQUEST, ex.getMessage());
 
         }catch(EntityNotFoundException ex){
-            logger.warn(ex.getMessage());
+            log.warn(ex.getMessage());
             return responseBuilder.httpError(HttpStatus.NOT_FOUND, ex.getMessage());
 
         }catch(Exception ex){
-            logger.error("error while attempting to reset cart", ex);
+            log.error("error while attempting to reset cart", ex);
             return responseBuilder.httpError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }

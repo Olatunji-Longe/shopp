@@ -1,13 +1,15 @@
 package com.shopp.domain.dto;
 
 import com.shopp.domain.RootEntity;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuperBuilder
 public abstract class EntityDTO<T extends RootEntity> {
 
-    EntityDTO(T entity){
+    protected EntityDTO(T entity){
         this.load(entity);
     }
 

@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Ticker;
 import com.shopp.configs.props.CacheSpecs;
 import com.shopp.configs.props.CacheSpecs.CacheSetting;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +20,11 @@ import org.springframework.context.annotation.Configuration;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Configuration
 @EnableCaching
 @EnableConfigurationProperties(CacheSpecs.class)
 public class CaffeineCacheConfig extends CachingConfigurerSupport {
-
-    private static final Logger logger = LoggerFactory.getLogger(CaffeineCacheConfig.class);
 
     private CacheSpecs specs;
 
@@ -47,7 +47,7 @@ public class CaffeineCacheConfig extends CachingConfigurerSupport {
     }
 
     private CaffeineCache buildCache(String cacheName, CacheSetting setting, Ticker ticker) {
-        logger.info("cache: {}, specs: {}", cacheName, setting.toString());
+        log.info("cache: {}, specs: {}", cacheName, setting.toString());
         return new CaffeineCache(cacheName,
                 Caffeine.newBuilder()
                         .initialCapacity(setting.getMinCapacity().intValue())

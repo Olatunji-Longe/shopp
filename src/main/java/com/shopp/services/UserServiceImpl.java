@@ -9,10 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
     private CredentialRepository credentialRepository;
+
+    public static final String CURRENT_USER_NAME = "olatunji.longe";
+    public static final String CURRENT_USER_EMAIL = "olatunji@longe.com";
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, CredentialRepository credentialRepository) {
@@ -22,6 +25,6 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getCurrentUser(){
-        return userRepository.findByEmail("olatunji@longe.com");
+        return userRepository.findByEmail(CURRENT_USER_NAME);
     }
 }

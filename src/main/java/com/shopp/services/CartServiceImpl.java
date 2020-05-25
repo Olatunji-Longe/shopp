@@ -1,11 +1,12 @@
 package com.shopp.services;
 
 import com.shopp.common.CacheHandler;
-import com.shopp.common.Localizer;
+import com.shopp.common.Translator;
 import com.shopp.domain.Book;
 import com.shopp.domain.Cart;
 import com.shopp.domain.CartItem;
 import com.shopp.domain.CheckoutState;
+import com.shopp.domain.Order;
 import com.shopp.exceptions.CheckoutStateException;
 import com.shopp.exceptions.InvalidRequestException;
 import com.shopp.repositories.BookRepository;
@@ -14,8 +15,7 @@ import com.shopp.repositories.CartRepository;
 import com.shopp.requests.CartItemRequest;
 import com.shopp.requests.CartRequest;
 import com.shopp.utils.CacheKeyGen;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -32,38 +32,31 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 @Transactional
 public class CartServiceImpl implements CartService {
-
-    private static final Logger logger = LoggerFactory.getLogger(CartService.class);
 
     private static final String CACHE_NAME_CART_ITEM ="shopping-cart-item";
     private static final String CACHE_NAME_CART_ITEM_LIST ="shopping-cart-item-list";
 
     @Autowired
-    private Localizer localizer;
+    private Translator translator;
 
     private CartItemRepository cartItemRepository;
     private BookRepository bookRepository;
     private CartRepository cartRepository;
     private CacheHandler cacheHandler;
+    private CheckoutService checkoutService;
 
     @Autowired
     public CartServiceImpl(CartItemRepository cartItemRepository, BookRepository bookRepository,
-                           CartRepository cartRepository, CacheHandler cacheHandler) {
+                           CartRepository cartRepository, CheckoutService checkoutService, CacheHandler cacheHandler) {
         this.cartItemRepository = cartItemRepository;
         this.bookRepository = bookRepository;
         this.cartRepository = cartRepository;
+        this.checkoutService = checkoutService;
         this.cacheHandler = cacheHandler;
-    }
-
-    public static String getCacheKey(Long cartId){
-        return CacheKeyGen.key(String.format("cached-cart-%s", cartId));
-    }
-
-    public static String getCacheKey(Long cartId, Long bookId){
-        return CacheKeyGen.key(String.format("cached-cart-%s-book-%s", cartId, bookId));
     }
 
     @Override
@@ -71,39 +64,39 @@ public class CartServiceImpl implements CartService {
         return cartItemRepository.countAllByCartIdAndCheckoutStateAndActive(cartId, CheckoutState.QUEUED, true);
     }
 
-    @Cacheable(cacheNames = CACHE_NAME_CART_ITEM_LIST, key = "T(com.shopp.services.CartServiceImpl).getCacheKey(#cartId)")
+    @Cacheable(cacheNames = CACHE_NAME_CART_ITEM_LIST, key = "T(com.shopp.services.CartService).getCacheKey(#cartId)")
     public List<CartItem> getCartItems(Long cartId) throws EntityNotFoundException {
 
-        logger.info("=== getCart === cartId: {}", cartId);
+        log.info("=== getCart === cartId: {}", cartId);
 
         Optional<Cart> cartOption = cartRepository.findById(cartId);
         if(cartOption.isPresent()){
             return cartItemRepository.findAllByCartIdAndCheckoutStateAndActive(cartId, CheckoutState.QUEUED, true);
         }
-        String message = localizer.translate("data.not-found.cart", cartId);
+        String message = translator.translate("data.not-found.cart", cartId);
         throw new EntityNotFoundException(message);
     }
 
-    @Cacheable(cacheNames = CACHE_NAME_CART_ITEM, key = "T(com.shopp.services.CartServiceImpl).getCacheKey(#cartId, #bookId)")
+    @Cacheable(cacheNames = CACHE_NAME_CART_ITEM, key = "T(com.shopp.services.CartService).getCacheKey(#cartId, #bookId)")
     public CartItem getCartItem(Long cartId, Long bookId) throws EntityNotFoundException {
 
-        logger.info("=== getCartItem === cartId: {} | bookId: {}", cartId, bookId);
+        log.info("=== getCartItem === cartId: {} | bookId: {}", cartId, bookId);
 
         CartItem cartItem = cartItemRepository.findByCartIdAndBookIdAndCheckoutStateAndActive(cartId, bookId, CheckoutState.QUEUED, true);
         if(cartItem == null){
-            String message = localizer.translate("data.not-found.cart-item", cartId, bookId);
+            String message = translator.translate("data.not-found.cart-item", cartId, bookId);
             throw new EntityNotFoundException(message);
         }
         return cartItem;
     }
 
     @Caching(
-        put = {@CachePut(cacheNames = CACHE_NAME_CART_ITEM, key = "T(com.shopp.services.CartServiceImpl).getCacheKey(#cartItemRequest.cartId, #cartItemRequest.bookId)")},
-        evict = {@CacheEvict(cacheNames = CACHE_NAME_CART_ITEM_LIST, key = "T(com.shopp.services.CartServiceImpl).getCacheKey(#cartItemRequest.cartId)")}
+        put = {@CachePut(cacheNames = CACHE_NAME_CART_ITEM, key = "T(com.shopp.services.CartService).getCacheKey(#cartItemRequest.cartId, #cartItemRequest.bookId)")},
+        evict = {@CacheEvict(cacheNames = CACHE_NAME_CART_ITEM_LIST, key = "T(com.shopp.services.CartService).getCacheKey(#cartItemRequest.cartId)")}
     )
     public CartItem addBookToCart(CartItemRequest cartItemRequest)throws InvalidRequestException, EntityNotFoundException{
 
-        logger.info("=== addBookToCart === {}", cartItemRequest.toString());
+        log.info("=== addBookToCart === {}", cartItemRequest.toString());
 
         String message;
 
@@ -114,13 +107,13 @@ public class CartServiceImpl implements CartService {
 
         Optional<Book> bookOption = bookRepository.findById(cartItemRequest.getBookId());
         if(!bookOption.isPresent()){
-            message = localizer.translate("data.not-found.book", cartItemRequest.getBookId());
+            message = translator.translate("data.not-found.book", cartItemRequest.getBookId());
             throw new EntityNotFoundException(message);
         }
 
         Optional<Cart> cartOption = cartRepository.findById(cartItemRequest.getCartId());
         if(!cartOption.isPresent()){
-            message = localizer.translate("data.not-found.cart", cartItemRequest.getCartId());
+            message = translator.translate("data.not-found.cart", cartItemRequest.getCartId());
             throw new EntityNotFoundException(message);
         }
 
@@ -135,7 +128,7 @@ public class CartServiceImpl implements CartService {
                 cartItem.setCheckoutState(CheckoutState.QUEUED);
                 return cartItemRepository.save(cartItem);
             }else{
-                message = localizer.translate("cart-request.invalid.quantity", quantity);
+                message = translator.translate("cart-request.invalid.quantity", quantity);
                 throw new InvalidRequestException(message);
             }
         }else{
@@ -144,7 +137,7 @@ public class CartServiceImpl implements CartService {
                 cartItem.setQuantity(quantity);
                 return cartItemRepository.save(cartItem);
             }else{
-                message = localizer.translate("cart-request.invalid.quantity.derived", cartItem.getQuantity(), cartItemRequest.getQuantity());
+                message = translator.translate("cart-request.invalid.quantity.derived", cartItem.getQuantity(), cartItemRequest.getQuantity());
                 throw new InvalidRequestException(message);
             }
         }
@@ -152,13 +145,13 @@ public class CartServiceImpl implements CartService {
 
     @Caching(
         evict = {
-            @CacheEvict(cacheNames = CACHE_NAME_CART_ITEM, key = "T(com.shopp.services.CartServiceImpl).getCacheKey(#cartItemRequest.cartId, #cartItemRequest.bookId)"),
-            @CacheEvict(cacheNames = CACHE_NAME_CART_ITEM_LIST, key = "T(com.shopp.services.CartServiceImpl).getCacheKey(#cartItemRequest.cartId)")
+            @CacheEvict(cacheNames = CACHE_NAME_CART_ITEM, key = "T(com.shopp.services.CartService).getCacheKey(#cartItemRequest.cartId, #cartItemRequest.bookId)"),
+            @CacheEvict(cacheNames = CACHE_NAME_CART_ITEM_LIST, key = "T(com.shopp.services.CartService).getCacheKey(#cartItemRequest.cartId)")
         }
     )
     public CartItem deleteBookFromCart(CartItemRequest cartItemRequest) throws InvalidRequestException, EntityNotFoundException {
 
-        logger.info("=== deleteBookFromCart === {}", cartItemRequest.toString());
+        log.info("=== deleteBookFromCart === {}", cartItemRequest.toString());
 
         String message;
         if(!cartItemRequest.isValid()){
@@ -168,7 +161,7 @@ public class CartServiceImpl implements CartService {
 
         CartItem cartItem = cartItemRepository.findByCartIdAndBookIdAndCheckoutStateAndActive(cartItemRequest.getCartId(), cartItemRequest.getBookId(), CheckoutState.QUEUED, true);
         if(cartItem == null){
-            message = localizer.translate("data.not-found.cart-items.on-payload", cartItemRequest.toString());
+            message = translator.translate("data.not-found.cart-items.on-payload", cartItemRequest.toString());
             throw new EntityNotFoundException(message);
         }
         cartItemRepository.delete(cartItem);
@@ -180,51 +173,47 @@ public class CartServiceImpl implements CartService {
         return cartItem;
     }
 
-    @CacheEvict(cacheNames = CACHE_NAME_CART_ITEM_LIST, key = "T(com.shopp.services.CartServiceImpl).getCacheKey(#cartRequest.cartId)")
-    public List<CartItem> checkoutBooksFromCart(CartRequest cartRequest) throws InvalidRequestException, EntityNotFoundException {
+    @CacheEvict(cacheNames = CACHE_NAME_CART_ITEM_LIST, key = "T(com.shopp.services.CartService).getCacheKey(#cartRequest.cartId)")
+    public Order checkoutBooksFromCart(CartRequest cartRequest) throws InvalidRequestException, EntityNotFoundException, CheckoutStateException {
 
-        logger.info("=== checkoutBooksFromCart === {}", cartRequest.toString());
+        log.info("=== checkoutBooksFromCart === {}", cartRequest.toString());
 
-        return updateCheckoutStates(cartRequest, CartRequest.Action.checkout);
+        Cart cart = validateRequestAndGetCart(cartRequest);
+        Order order = checkoutService.checkoutOrder(cart);
+        if(order != null){
+            updateCheckoutStates(cart, CartRequest.Action.checkout);
+        }
+        return order;
     }
 
-    @CacheEvict(cacheNames = CACHE_NAME_CART_ITEM_LIST, key = "T(com.shopp.services.CartServiceImpl).getCacheKey(#cartRequest.cartId)")
-    public List<CartItem> purgeBooksFromCart(CartRequest cartRequest) throws InvalidRequestException, EntityNotFoundException {
+    @CacheEvict(cacheNames = CACHE_NAME_CART_ITEM_LIST, key = "T(com.shopp.services.CartService).getCacheKey(#cartRequest.cartId)")
+    public List<CartItem> purgeBooksFromCart(CartRequest cartRequest) throws InvalidRequestException, EntityNotFoundException, CheckoutStateException {
 
-        logger.info("=== purgeBooksFromCart === {}", cartRequest.toString());
+        log.info("=== purgeBooksFromCart === {}", cartRequest.toString());
 
-        return updateCheckoutStates(cartRequest, CartRequest.Action.reset);
+        Cart cart = validateRequestAndGetCart(cartRequest);
+        return updateCheckoutStates(cart, CartRequest.Action.reset);
     }
 
     @Override
-    public BigDecimal getCartItemsSubTotal(Long cartId) {
+    public BigDecimal getCartItemsSubTotal(Long cartId) throws CheckoutStateException {
         Float sum = cartItemRepository.findSubTotalByCartIdAndCheckoutStateAndActive(cartId, CheckoutState.QUEUED, true);
         return new BigDecimal(Float.toString(sum)).setScale(2, RoundingMode.HALF_DOWN);
     }
 
-    private List<CartItem> updateCheckoutStates(CartRequest cartRequest, CartRequest.Action cartRequestAction) throws InvalidRequestException, EntityNotFoundException, CheckoutStateException {
+    private List<CartItem> updateCheckoutStates(Cart cart, CartRequest.Action cartRequestAction) throws InvalidRequestException, EntityNotFoundException, CheckoutStateException {
 
-        logger.info("=== updateCheckoutStates === action: {}, payload: {}", cartRequestAction, cartRequest.toString());
+        log.info("=== updateCheckoutStates === action: {}, cartId: {}", cartRequestAction, cart.getId());
 
         String message;
-        if(!cartRequest.isValid()){
-            message = cartRequest.getMessages().toString();
-            throw new InvalidRequestException(message);
-        }
-
-        Optional<Cart> cartOption = cartRepository.findById(cartRequest.getCartId());
-        if(!cartOption.isPresent()) {
-            message = localizer.translate("data.not-found.cart", cartRequest.getCartId());
-            throw new EntityNotFoundException(message);
-        }
 
         Set<String> cacheKeys = new HashSet<>();
 
-        List<CartItem> cartItems = cartItemRepository.findAllByCartIdAndCheckoutStateAndActive(cartRequest.getCartId(), CheckoutState.QUEUED, true);
+        List<CartItem> cartItems = cartItemRepository.findAllByCartIdAndCheckoutStateAndActive(cart.getId(), CheckoutState.QUEUED, true);
         for(CartItem cartItem : cartItems){
 
             if(!cartItem.getCheckoutState().equals(CheckoutState.QUEUED)){
-                message = localizer.translate("cart-item.invalid.checkout-state", cartRequestAction, cartItem.getId(), cartItem.getCheckoutState(), CheckoutState.QUEUED);
+                message = translator.translate("cart-item.invalid.checkout-state", cartRequestAction, cartItem.getId(), cartItem.getCheckoutState(), CheckoutState.QUEUED);
                 throw new CheckoutStateException(message);
             }
 
@@ -237,7 +226,7 @@ public class CartServiceImpl implements CartService {
             }
 
             // Grab all cache keys for each cartItem
-            cacheKeys.add(getCacheKey(cartItem.getCart().getId(), cartItem.getBook().getId()));
+            cacheKeys.add(CartService.getCacheKey(cartItem.getCart().getId(), cartItem.getBook().getId()));
         }
 
         if(!cartItems.isEmpty()){
@@ -250,6 +239,21 @@ public class CartServiceImpl implements CartService {
         }
 
         return cartItems;
+    }
+
+
+    private Cart validateRequestAndGetCart(CartRequest cartRequest) throws InvalidRequestException, EntityNotFoundException {
+
+        if(!cartRequest.isValid()){
+            throw new InvalidRequestException(cartRequest.getMessages().toString());
+        }
+
+        Optional<Cart> cartOption = cartRepository.findById(cartRequest.getCartId());
+        if(!cartOption.isPresent()) {
+            throw new EntityNotFoundException(translator.translate("data.not-found.cart", cartRequest.getCartId()));
+        }
+
+        return cartOption.get();
     }
 
 }

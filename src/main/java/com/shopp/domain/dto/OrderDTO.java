@@ -1,12 +1,18 @@
 package com.shopp.domain.dto;
 
 import com.shopp.domain.Order;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Getter
+@SuperBuilder
 public class OrderDTO extends EntityDTO<Order> {
 
     private Long id;
@@ -16,8 +22,9 @@ public class OrderDTO extends EntityDTO<Order> {
     private String reference;
     private AddressDTO sourceAddress;
     private AddressDTO destinationAddress;
-    private List<CartItemDTO> cartItems = new ArrayList<>();
-    private List<FeeDTO> fees = new ArrayList<>();
+    private List<CartItemDTO> cartItems;
+    private List<FeeDTO> fees;
+
     private String createdBy;
     private Date createdAt;
     private String modifiedBy;
@@ -44,56 +51,5 @@ public class OrderDTO extends EntityDTO<Order> {
         this.netTotal = order.getNetTotal();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public BigDecimal getTotalFees() {
-        return totalFees;
-    }
-
-    public BigDecimal getNetTotal() {
-        return netTotal;
-    }
-
-    public String getReference() {
-        return reference;
-    }
-
-    public List<FeeDTO> getFees() {
-        return fees;
-    }
-
-    public AddressDTO getSourceAddress() {
-        return sourceAddress;
-    }
-
-    public AddressDTO getDestinationAddress() {
-        return destinationAddress;
-    }
-
-    public List<CartItemDTO> getCartItems() {
-        return cartItems;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getModifiedBy() {
-        return modifiedBy;
-    }
-
-    public Date getModifiedAt() {
-        return modifiedAt;
-    }
 
 }

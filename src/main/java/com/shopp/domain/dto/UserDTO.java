@@ -1,12 +1,20 @@
 package com.shopp.domain.dto;
 
+import com.shopp.domain.Credential;
 import com.shopp.domain.User;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@SuperBuilder
 public class UserDTO extends EntityDTO<User> {
 
     private Long id;
+    private String username;
     private String firstName;
     private String lastName;
     private String email;
@@ -17,6 +25,11 @@ public class UserDTO extends EntityDTO<User> {
         super(user);
     }
 
+    private UserDTO(Credential credential){
+        super(credential.getUser());
+        this.username = credential.getUsername();
+    }
+
     @Override
     protected void load(User user) {
         this.id = user.getId();
@@ -25,30 +38,10 @@ public class UserDTO extends EntityDTO<User> {
         this.email = user.getEmail();
         this.addresses = AddressDTO.list(user.getAddresses());
         this.cart = user.getCart().toDTO();
-
     }
 
-    public Long getId() {
-        return id;
+    public static UserDTO of(Credential credential){
+        return new UserDTO(credential);
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public List<AddressDTO> getAddresses() {
-        return addresses;
-    }
-
-    public CartDTO getCart() {
-        return cart;
-    }
 }
