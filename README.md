@@ -39,7 +39,13 @@ NOTE - All data exposed by the API endpoints are preloaded on the application's 
 you can simply stop the application, delete the folder named `database` located directly under the root of the application, 
 and start the application again. Now, you will be presented with fresh data from scratch.
 
+##### Testing
+Two sample unit/integration tests are currently provided just to show the testing possibilities. 
+To run the sample tests issue the following command at the root of the project;
 
+```
+    ./gradlew clean test --info
+```
 
 ---
 
