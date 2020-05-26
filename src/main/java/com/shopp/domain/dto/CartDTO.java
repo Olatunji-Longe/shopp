@@ -33,7 +33,7 @@ public class CartDTO extends EntityDTO<Cart> {
     @Override
     protected void load(Cart cart) {
         this.id = cart.getId();
-        this.store = cart.getStore().toDTO();
+        this.store = cart.getStore() != null ? cart.getStore().toDTO() : null;
     }
 
     public static CartDTO of(List<CartItem> cartItems) {

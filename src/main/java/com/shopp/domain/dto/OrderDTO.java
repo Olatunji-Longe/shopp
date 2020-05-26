@@ -38,8 +38,8 @@ public class OrderDTO extends EntityDTO<Order> {
     protected void load(Order order) {
         this.id = order.getId();
         this.reference = order.getReference();
-        this.sourceAddress = order.getSourceAddress().toDTO();
-        this.destinationAddress = order.getDestinationAddress().toDTO();
+        this.sourceAddress = order.getSourceAddress() != null ? order.getSourceAddress().toDTO() : null;
+        this.destinationAddress = order.getDestinationAddress() != null ? order.getDestinationAddress().toDTO() : null;
         this.cartItems = CartItemDTO.list(order.getCartItems());
         this.fees = FeeDTO.list(order.getFees());
         this.createdBy = order.getCreatedBy();
