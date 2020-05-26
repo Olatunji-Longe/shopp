@@ -13,6 +13,7 @@ public class FeeDTO extends EntityDTO<Fee> {
 
     private Long id;
     private FeeType feeType;
+    private String description;
     private BigDecimal amount;
 
     public FeeDTO(Fee fee) {
@@ -23,6 +24,7 @@ public class FeeDTO extends EntityDTO<Fee> {
     protected void load(Fee fee) {
         this.id = fee.getId();
         this.feeType = fee.getFeeType();
+        this.description = fee.getDescription();
         this.amount = fee.getAmount();
     }
 
