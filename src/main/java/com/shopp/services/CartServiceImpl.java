@@ -198,7 +198,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public BigDecimal getCartItemsSubTotal(Long cartId) throws CheckoutStateException {
         Float sum = cartItemRepository.findSubTotalByCartIdAndCheckoutStateAndActive(cartId, CheckoutState.QUEUED, true);
-        return new BigDecimal(Float.toString(sum)).setScale(2, RoundingMode.HALF_DOWN);
+        return new BigDecimal(Float.toString(sum != null ? sum : 0)).setScale(2, RoundingMode.HALF_DOWN);
     }
 
     private List<CartItem> updateCheckoutStates(Cart cart, CartRequest.Action cartRequestAction) throws InvalidRequestException, EntityNotFoundException, CheckoutStateException {

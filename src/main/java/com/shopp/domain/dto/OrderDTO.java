@@ -1,14 +1,10 @@
 package com.shopp.domain.dto;
 
 import com.shopp.domain.Order;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -26,9 +22,9 @@ public class OrderDTO extends EntityDTO<Order> {
     private List<FeeDTO> fees;
 
     private String createdBy;
-    private Date createdAt;
+    private Long createdAtMillis;
     private String modifiedBy;
-    private Date modifiedAt;
+    private Long modifiedAtMillis;
 
     public OrderDTO(Order entity) {
         super(entity);
@@ -38,14 +34,14 @@ public class OrderDTO extends EntityDTO<Order> {
     protected void load(Order order) {
         this.id = order.getId();
         this.reference = order.getReference();
-        this.sourceAddress = order.getSourceAddress().toDTO();
-        this.destinationAddress = order.getDestinationAddress().toDTO();
+        this.sourceAddress = order.getSourceAddress() != null ? order.getSourceAddress().toDTO() : null;
+        this.destinationAddress = order.getDestinationAddress() != null ? order.getDestinationAddress().toDTO() : null;
         this.cartItems = CartItemDTO.list(order.getCartItems());
         this.fees = FeeDTO.list(order.getFees());
         this.createdBy = order.getCreatedBy();
-        this.createdAt = order.getCreatedAt();
+        this.createdAtMillis = order.getCreatedAt().getTime();
         this.modifiedBy = order.getModifiedBy();
-        this.modifiedAt = order.getModifiedAt();
+        this.modifiedAtMillis = order.getModifiedAt().getTime();
         this.totalAmount = order.getTotalAmount();
         this.totalFees = order.getTotalFees();
         this.netTotal = order.getNetTotal();

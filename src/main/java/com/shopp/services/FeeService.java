@@ -18,7 +18,7 @@ public interface FeeService {
 
     static  List<Fee> getRandomFees(BigDecimal totalAmount) {
         return Arrays.asList(
-                Fee.builder().feeType(FeeType.SHIPPING).amount(FeeType.SHIPPING.of(totalAmount)).description("Shipping").build(),
+                Fee.builder().feeType(FeeType.SHIPPING).amount(BigDecimal.valueOf(24.00)).description("Shipping").build(),
                 Fee.builder().feeType(FeeType.DISCOUNT).amount(FeeType.DISCOUNT.of(totalAmount)).description("Mother's Day Promo").build(),
                 Fee.builder().feeType(FeeType.TAX).amount(FeeType.TAX.of(totalAmount)).description("Tax").build()
         );

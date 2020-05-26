@@ -37,7 +37,7 @@ public class UserDTO extends EntityDTO<User> {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.addresses = AddressDTO.list(user.getAddresses());
-        this.cart = user.getCart().toDTO();
+        this.cart = user.getCart() != null ? user.getCart().toDTO() : null;
     }
 
     public static UserDTO of(Credential credential){

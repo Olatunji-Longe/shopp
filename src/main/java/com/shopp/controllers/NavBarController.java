@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.persistence.EntityNotFoundException;
 
 @Slf4j
-@Transactional
 @RestController
 @RequestMapping("/nav")
 public class NavBarController {
